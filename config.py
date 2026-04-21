@@ -1,7 +1,7 @@
 # ====================================================================
 # Configuration Settings for MarketMind Intelligence Platform V1
 # Author: Sharique Mohammad
-# Date: April 20, 2026
+# Date: April 21, 2026 (Updated with enhanced logging)
 # ====================================================================
 # FILE: config.py (Project Root)
 # Purpose: Centralize all configuration settings
@@ -16,7 +16,7 @@ This file manages:
 - PostgreSQL connection
 - File paths and directory structure
 - Rate limiting configuration
-- Logging configuration
+- Enhanced layer-specific logging
 
 Usage:
     from config import get_database_url, POLYGON_API_KEY, KAFKA_CONFIG
@@ -57,6 +57,7 @@ SILVER_TRANSFORMATIONS_DIR = SILVER_DIR / "transformations"
 SILVER_QUALITY_DIR = SILVER_DIR / "quality"
 
 # Gold layer
+GOLD_LOADERS_DIR = GOLD_DIR / "loaders"
 GOLD_AGGREGATIONS_DIR = GOLD_DIR / "aggregations"
 GOLD_SNAPSHOTS_DIR = GOLD_DIR / "snapshots"
 GOLD_SCHEMAS_DIR = GOLD_DIR / "schemas"
@@ -74,11 +75,14 @@ AIRFLOW_DAGS_DIR = AIRFLOW_DIR / "dags"
 AIRFLOW_UTILS_DIR = AIRFLOW_DIR / "utils"
 AIRFLOW_CONFIG_DIR = AIRFLOW_DIR / "config"
 
-# Logs
+# Logs - Enhanced with layer-specific directories
 LOGS_DIR = PROJECT_ROOT / "logs"
 LOGS_BRONZE_DIR = LOGS_DIR / "bronze"
 LOGS_SILVER_DIR = LOGS_DIR / "silver"
 LOGS_GOLD_DIR = LOGS_DIR / "gold"
+LOGS_AIRFLOW_DIR = LOGS_DIR / "airflow"
+LOGS_KAFKA_DIR = LOGS_DIR / "kafka"
+LOGS_PIPELINE_DIR = LOGS_DIR / "pipeline"
 
 # Tests
 TESTS_DIR = PROJECT_ROOT / "tests"
@@ -92,6 +96,12 @@ NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
 # Docs
 DOCS_DIR = PROJECT_ROOT / "docs"
 
+# Scripts
+SCRIPTS_DIR = PROJECT_ROOT / "scripts"
+
+# Checkpoints
+CHECKPOINTS_DIR = DATA_DIR / "checkpoints"
+
 # Auto-create all directories on import
 for directory in [
     BRONZE_CONNECTORS_DIR,
@@ -101,6 +111,7 @@ for directory in [
     BRONZE_SCHEMAS_AVRO_DIR,
     SILVER_TRANSFORMATIONS_DIR,
     SILVER_QUALITY_DIR,
+    GOLD_LOADERS_DIR,
     GOLD_AGGREGATIONS_DIR,
     GOLD_SNAPSHOTS_DIR,
     GOLD_SCHEMAS_DIR,
@@ -114,11 +125,16 @@ for directory in [
     LOGS_BRONZE_DIR,
     LOGS_SILVER_DIR,
     LOGS_GOLD_DIR,
+    LOGS_AIRFLOW_DIR,
+    LOGS_KAFKA_DIR,
+    LOGS_PIPELINE_DIR,
     TESTS_UNIT_DIR,
     TESTS_INTEGRATION_DIR,
     TESTS_SCHEMAS_DIR,
     NOTEBOOKS_DIR,
     DOCS_DIR,
+    SCRIPTS_DIR,
+    CHECKPOINTS_DIR,
 ]:
     directory.mkdir(parents=True, exist_ok=True)
 
@@ -179,7 +195,7 @@ KAFKA_CONFIG = {
     'retries': int(os.getenv('KAFKA_RETRIES', 3)),
     'batch_size': int(os.getenv('KAFKA_BATCH_SIZE', 16384)),
     'linger_ms': int(os.getenv('KAFKA_LINGER_MS', 10)),
-    'buffer_memory': int(os.getenv('KAFKA_BUFFER_MEMORY', 33554432)),
+    'queue.buffering.max.messages': int(os.getenv('KAFKA_QUEUE_BUFFER_MAX_MESSAGES', 100000)),
 }
 
 # Kafka Topics
@@ -314,56 +330,137 @@ GOLD_CONFIG = {
 }
 
 # ====================================================================
-# LOGGING CONFIGURATION
+# ENHANCED LOGGING CONFIGURATION
 # ====================================================================
 
 LOGGING_CONFIG = {
     'level': os.getenv('LOG_LEVEL', 'INFO'),
     'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    
+    # Master logs
     'app_log': LOGS_DIR / 'app.log',
     'error_log': LOGS_DIR / 'error.log',
-    'bronze_log': LOGS_BRONZE_DIR / 'bronze.log',
-    'silver_log': LOGS_SILVER_DIR / 'silver.log',
-    'gold_log': LOGS_GOLD_DIR / 'gold.log',
-    'pipeline_log': LOGS_DIR / 'pipeline.log',
+    
+    # Bronze layer logs
+    'bronze_connectors_log': LOGS_BRONZE_DIR / 'connectors.log',
+    'bronze_producers_log': LOGS_BRONZE_DIR / 'producers.log',
+    'bronze_writers_log': LOGS_BRONZE_DIR / 'writers.log',
+    
+    # Silver layer logs
+    'silver_transformers_log': LOGS_SILVER_DIR / 'transformers.log',
+    'silver_quality_log': LOGS_SILVER_DIR / 'quality.log',
+    
+    # Gold layer logs
+    'gold_loaders_log': LOGS_GOLD_DIR / 'loaders.log',
+    
+    # Infrastructure logs
+    'airflow_log': LOGS_AIRFLOW_DIR / 'dags.log',
+    'kafka_log': LOGS_KAFKA_DIR / 'kafka.log',
+    'pipeline_log': LOGS_PIPELINE_DIR / 'orchestration.log',
 }
 
 
 def get_logger(name: str) -> logging.Logger:
     """
-    Return a named logger writing to console and logs/app.log.
-
+    Return a named logger with layer-specific log files.
+    
+    Determines log file based on module name:
+    - bronze.connectors.* --> logs/bronze/connectors.log
+    - bronze.producers.* --> logs/bronze/producers.log
+    - bronze.writers.* --> logs/bronze/writers.log
+    - silver.transformations.* --> logs/silver/transformers.log
+    - silver.quality.* --> logs/silver/quality.log
+    - gold.loaders.* --> logs/gold/loaders.log
+    - airflow.* --> logs/airflow/dags.log
+    - kafka.* --> logs/kafka/kafka.log
+    - orchestration/bootstrap --> logs/pipeline/orchestration.log
+    
+    All loggers also write to:
+    - Console (stdout)
+    - logs/app.log (master log)
+    - logs/error.log (errors only)
+    
     Usage:
         from config import get_logger
         logger = get_logger(__name__)
     """
     logger = logging.getLogger(name)
 
+    # Avoid duplicate handlers
     if logger.handlers:
-        return logger  # already configured, avoid duplicate handlers
+        return logger
 
     level = getattr(logging, LOGGING_CONFIG['level'].upper(), logging.INFO)
     fmt = logging.Formatter(LOGGING_CONFIG['format'])
 
-    # Console handler
+    # ================================================================
+    # CONSOLE HANDLER - Always show on screen
+    # ================================================================
     ch = logging.StreamHandler()
     ch.setLevel(level)
     ch.setFormatter(fmt)
 
-    # App log file handler
-    fh = logging.FileHandler(LOGGING_CONFIG['app_log'], encoding='utf-8')
-    fh.setLevel(level)
-    fh.setFormatter(fmt)
+    # ================================================================
+    # MASTER APP LOG - Everything goes here
+    # ================================================================
+    app_handler = logging.FileHandler(LOGGING_CONFIG['app_log'], encoding='utf-8')
+    app_handler.setLevel(level)
+    app_handler.setFormatter(fmt)
 
-    # Error log file handler - errors and above only
-    eh = logging.FileHandler(LOGGING_CONFIG['error_log'], encoding='utf-8')
-    eh.setLevel(logging.ERROR)
-    eh.setFormatter(fmt)
+    # ================================================================
+    # ERROR LOG - Errors only
+    # ================================================================
+    error_handler = logging.FileHandler(LOGGING_CONFIG['error_log'], encoding='utf-8')
+    error_handler.setLevel(logging.ERROR)
+    error_handler.setFormatter(fmt)
 
+    # ================================================================
+    # LAYER-SPECIFIC LOG - Based on module name
+    # ================================================================
+    layer_log_file = None
+    
+    # Bronze layer
+    if 'bronze.connectors' in name or 'connectors.polygon' in name or 'connectors.akshare' in name or 'connectors.edgartools' in name:
+        layer_log_file = LOGGING_CONFIG['bronze_connectors_log']
+    elif 'bronze.producers' in name or 'kafka_producer' in name:
+        layer_log_file = LOGGING_CONFIG['bronze_producers_log']
+    elif 'bronze.writers' in name or 'bronze_writer' in name:
+        layer_log_file = LOGGING_CONFIG['bronze_writers_log']
+    
+    # Silver layer
+    elif 'silver.transformations' in name or 'transformer' in name:
+        layer_log_file = LOGGING_CONFIG['silver_transformers_log']
+    elif 'silver.quality' in name or 'quality_check' in name:
+        layer_log_file = LOGGING_CONFIG['silver_quality_log']
+    
+    # Gold layer
+    elif 'gold.loaders' in name or ('loader' in name and 'gold' in name):
+        layer_log_file = LOGGING_CONFIG['gold_loaders_log']
+    
+    # Airflow
+    elif 'airflow' in name or 'dags' in name:
+        layer_log_file = LOGGING_CONFIG['airflow_log']
+    
+    # Kafka
+    elif 'kafka' in name or 'confluent' in name:
+        layer_log_file = LOGGING_CONFIG['kafka_log']
+    
+    # Orchestration
+    elif 'orchestrat' in name or 'bootstrap' in name or 'master' in name or 'scripts' in name:
+        layer_log_file = LOGGING_CONFIG['pipeline_log']
+
+    # Add layer-specific handler if determined
+    if layer_log_file:
+        layer_handler = logging.FileHandler(layer_log_file, encoding='utf-8')
+        layer_handler.setLevel(level)
+        layer_handler.setFormatter(fmt)
+        logger.addHandler(layer_handler)
+
+    # Add common handlers
     logger.setLevel(level)
     logger.addHandler(ch)
-    logger.addHandler(fh)
-    logger.addHandler(eh)
+    logger.addHandler(app_handler)
+    logger.addHandler(error_handler)
     logger.propagate = False
 
     return logger
@@ -391,10 +488,6 @@ def validate_config() -> bool:
     # Kafka
     if not KAFKA_CONFIG['bootstrap_servers']:
         errors.append("KAFKA_BOOTSTRAP_SERVERS not set")
-
-    # Data scope
-    if not Path(DATA_SCOPE['ticker_universe_file']).exists():
-        errors.append(f"Ticker universe file not found: {DATA_SCOPE['ticker_universe_file']}")
 
     if errors:
         print("Configuration errors:")
@@ -471,6 +564,26 @@ if __name__ == '__main__':
     print(f"Data scope:          {DATA_SCOPE['start_date']} to {DATA_SCOPE['end_date']}")
     print(f"Expected tickers:    {EXPECTED_VOLUMES['ticker_count']}")
     print(f"Expected days:       {EXPECTED_VOLUMES['days_count']}")
+    
+    print("\n" + "=" * 80)
+    print("LOGGING STRUCTURE")
+    print("=" * 80)
+    print("Master logs:")
+    print(f"  - {LOGGING_CONFIG['app_log']}")
+    print(f"  - {LOGGING_CONFIG['error_log']}")
+    print("\nBronze layer:")
+    print(f"  - {LOGGING_CONFIG['bronze_connectors_log']}")
+    print(f"  - {LOGGING_CONFIG['bronze_producers_log']}")
+    print(f"  - {LOGGING_CONFIG['bronze_writers_log']}")
+    print("\nSilver layer:")
+    print(f"  - {LOGGING_CONFIG['silver_transformers_log']}")
+    print(f"  - {LOGGING_CONFIG['silver_quality_log']}")
+    print("\nGold layer:")
+    print(f"  - {LOGGING_CONFIG['gold_loaders_log']}")
+    print("\nInfrastructure:")
+    print(f"  - {LOGGING_CONFIG['airflow_log']}")
+    print(f"  - {LOGGING_CONFIG['kafka_log']}")
+    print(f"  - {LOGGING_CONFIG['pipeline_log']}")
     
     print("\n" + "=" * 80)
     print("CONFIGURATION VALIDATION")

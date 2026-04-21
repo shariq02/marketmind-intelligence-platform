@@ -188,6 +188,7 @@ class MarketBarsLoader:
         sql = f"""
             INSERT INTO gold.ohlcv_bars ({', '.join(columns)})
             VALUES %s
+            ON CONFLICT (ticker, timestamp, granularity) DO NOTHING
         """
         
         cur = conn.cursor()

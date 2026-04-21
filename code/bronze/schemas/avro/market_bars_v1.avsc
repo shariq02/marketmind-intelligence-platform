@@ -1,0 +1,77 @@
+{
+  "type": "record",
+  "name": "MarketBar",
+  "namespace": "com.marketmind.market.bars.v1",
+  "doc": "OHLCV bar (candlestick) data from Polygon.io API. Represents price and volume for a specific time period (1min, 5min, 1hour, daily, etc.)",
+  "fields": [
+    {
+      "name": "ticker",
+      "type": "string",
+      "doc": "Stock ticker symbol (e.g., AAPL, MSFT, GOOGL)"
+    },
+    {
+      "name": "timestamp",
+      "type": "long",
+      "doc": "Unix timestamp in milliseconds (UTC). Represents the start of the bar period."
+    },
+    {
+      "name": "granularity",
+      "type": "string",
+      "doc": "Bar granularity: 1min, 5min, 15min, 1hour, daily. Derived from API request parameters."
+    },
+    {
+      "name": "open",
+      "type": "double",
+      "doc": "Opening price for the period"
+    },
+    {
+      "name": "high",
+      "type": "double",
+      "doc": "Highest price during the period"
+    },
+    {
+      "name": "low",
+      "type": "double",
+      "doc": "Lowest price during the period"
+    },
+    {
+      "name": "close",
+      "type": "double",
+      "doc": "Closing price for the period"
+    },
+    {
+      "name": "volume",
+      "type": "double",
+      "doc": "Total trading volume for the period (number of shares traded)"
+    },
+    {
+      "name": "vwap",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Volume-weighted average price for the period. Optional field, may be null."
+    },
+    {
+      "name": "trade_count",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Number of individual trades during the period. Optional field, may be null."
+    },
+    {
+      "name": "adjusted",
+      "type": "boolean",
+      "default": true,
+      "doc": "Whether prices are adjusted for corporate actions (splits, dividends). True = adjusted, False = unadjusted."
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "default": "polygon",
+      "doc": "Data source identifier (polygon, alpaca, etc.)"
+    },
+    {
+      "name": "ingestion_timestamp",
+      "type": "long",
+      "doc": "Unix timestamp in milliseconds when this record was ingested into the system"
+    }
+  ]
+}

@@ -28,6 +28,7 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
+__init__.py
 
 # Airflow
 airflow/logs/

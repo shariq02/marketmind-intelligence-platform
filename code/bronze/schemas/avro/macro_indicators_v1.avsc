@@ -1,0 +1,67 @@
+{
+  "type": "record",
+  "name": "MacroIndicator",
+  "namespace": "com.marketmind.macro.indicators.v1",
+  "doc": "Macroeconomic indicator data from AkShare library. Includes US GDP, CPI, unemployment rate, interest rates, and other macro metrics. Chinese column names from AkShare are mapped to English field names.",
+  "fields": [
+    {
+      "name": "indicator_name",
+      "type": "string",
+      "doc": "Name of the macroeconomic indicator (e.g., 'US_GDP_QOQ', 'US_CPI_MOM', 'US_UNEMPLOYMENT_RATE', 'US_FEDERAL_FUNDS_RATE'). Mapped from AkShare Chinese field."
+    },
+    {
+      "name": "date",
+      "type": "string",
+      "doc": "Date of the indicator value (format: YYYY-MM-DD). Mapped from AkShare Chinese field '日期'."
+    },
+    {
+      "name": "value",
+      "type": "double",
+      "doc": "Current value of the indicator. Mapped from AkShare Chinese field '今值' (current value)."
+    },
+    {
+      "name": "forecast_value",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Forecasted/predicted value of the indicator. Mapped from AkShare Chinese field '预测值'. May be null if no forecast available."
+    },
+    {
+      "name": "previous_value",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Previous period value of the indicator. Mapped from AkShare Chinese field '前值'. May be null for first observation."
+    },
+    {
+      "name": "unit",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Unit of measurement (e.g., 'percent', 'billions_usd', 'index'). Derived from indicator metadata."
+    },
+    {
+      "name": "frequency",
+      "type": {
+        "type": "enum",
+        "name": "Frequency",
+        "symbols": ["DAILY", "WEEKLY", "MONTHLY", "QUARTERLY", "ANNUALLY"]
+      },
+      "doc": "Frequency of indicator publication (e.g., MONTHLY for CPI, QUARTERLY for GDP)"
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "default": "akshare",
+      "doc": "Data source identifier"
+    },
+    {
+      "name": "source_url",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "URL to original data source (e.g., BLS, BEA, Federal Reserve)"
+    },
+    {
+      "name": "ingestion_timestamp",
+      "type": "long",
+      "doc": "Unix timestamp in milliseconds when this record was ingested into the system"
+    }
+  ]
+}

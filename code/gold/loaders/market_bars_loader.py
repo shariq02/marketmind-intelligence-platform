@@ -128,7 +128,6 @@ class MarketBarsLoader:
             'month',
             'day',
             'is_trading_day',
-            'is_valid_ohlc'
         ]
         
         # Filter to only valid OHLC records

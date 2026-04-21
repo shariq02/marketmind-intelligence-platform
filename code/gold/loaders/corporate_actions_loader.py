@@ -24,12 +24,13 @@ Usage:
 """
 
 import pandas as pd
+import psycopg2
+from psycopg2.extras import execute_values
 from pathlib import Path
 from datetime import datetime
-from sqlalchemy import create_engine, text
 
 from config import (
-    get_database_url,
+    DATABASE_CONFIG,
     DATA_DIR,
     get_logger,
 )
@@ -45,12 +46,21 @@ class CorporateActionsLoader:
     """
     
     def __init__(self):
-        """Initialize loader with database connection."""
-        self.engine = create_engine(get_database_url())
+        """Initialize loader."""
         self.silver_base_path = DATA_DIR / 'silver' / 'corporate_actions'
         self.table_name = 'gold.corporate_actions'
         
         logger.info("CorporateActionsLoader initialized")
+    
+    def get_connection(self):
+        """Create and return a PostgreSQL connection."""
+        return psycopg2.connect(
+            host=DATABASE_CONFIG['host'],
+            port=DATABASE_CONFIG['port'],
+            dbname=DATABASE_CONFIG['database'],
+            user=DATABASE_CONFIG['user'],
+            password=DATABASE_CONFIG['password'],
+        )
     
     def read_silver_data(self) -> pd.DataFrame:
         """
@@ -89,7 +99,7 @@ class CorporateActionsLoader:
         Returns:
             Gold-ready DataFrame
         """
-        # Select columns for Gold table
+        # Select columns for Gold table (match gold_tables.sql schema)
         gold_columns = [
             'ticker',
             'action_type',
@@ -131,7 +141,7 @@ class CorporateActionsLoader:
             invalid_count = len(df) - len(df_valid)
             logger.warning(f"Filtered out {invalid_count} invalid corporate actions")
         
-        # Select columns (only those that exist)
+        # Select only columns that exist
         existing_columns = [col for col in gold_columns if col in df_valid.columns]
         df_gold = df_valid[existing_columns].copy()
         
@@ -139,30 +149,37 @@ class CorporateActionsLoader:
         
         return df_gold
     
-    def load_to_postgres(self, df: pd.DataFrame, if_exists: str = 'append'):
+    def load_to_postgres(self, conn, df: pd.DataFrame):
         """
-        Load DataFrame to PostgreSQL.
+        Load DataFrame to PostgreSQL using bulk insert.
         
         Args:
+            conn: Database connection
             df: DataFrame to load
-            if_exists: How to behave if table exists ('append', 'replace', 'fail')
         """
         if df.empty:
             logger.warning("No data to load")
             return
         
-        # Load to PostgreSQL
-        df.to_sql(
-            name='corporate_actions',
-            schema='gold',
-            con=self.engine,
-            if_exists=if_exists,
-            index=False,
-            method='multi',
-            chunksize=1000
-        )
+        columns = list(df.columns)
+        rows = [tuple(row) for row in df.itertuples(index=False, name=None)]
         
-        logger.info(f"Loaded {len(df)} records to {self.table_name}")
+        sql = f"""
+            INSERT INTO gold.corporate_actions ({', '.join(columns)})
+            VALUES %s
+        """
+        
+        cur = conn.cursor()
+        try:
+            execute_values(cur, sql, rows, page_size=1000)
+            conn.commit()
+            logger.info(f"Loaded {len(df)} records to {self.table_name}")
+        except Exception as exc:
+            conn.rollback()
+            logger.error(f"Failed to load data: {exc}")
+            raise
+        finally:
+            cur.close()
     
     def load_all(self, mode: str = 'replace'):
         """
@@ -190,24 +207,36 @@ class CorporateActionsLoader:
             logger.warning("No valid data after preparation")
             return False
         
-        # Load to PostgreSQL
-        self.load_to_postgres(df_gold, if_exists=mode)
+        # Connect and load
+        conn = self.get_connection()
         
-        logger.info(f"Successfully loaded {len(df_gold)} corporate actions")
-        
-        return True
+        try:
+            if mode == 'replace':
+                cur = conn.cursor()
+                cur.execute("TRUNCATE TABLE gold.corporate_actions")
+                conn.commit()
+                cur.close()
+                logger.info("Truncated gold.corporate_actions table")
+            
+            self.load_to_postgres(conn, df_gold)
+            
+            logger.info(f"Successfully loaded {len(df_gold)} corporate actions")
+            return True
+            
+        finally:
+            conn.close()
     
     def get_record_count(self) -> int:
         """Get total record count in Gold table."""
-        with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT COUNT(*) FROM gold.corporate_actions"))
-            count = result.scalar()
-        
-        return count
-    
-    def close(self):
-        """Close database connection."""
-        self.engine.dispose()
+        conn = self.get_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT COUNT(*) FROM gold.corporate_actions")
+            count = cur.fetchone()[0]
+            cur.close()
+            return count
+        finally:
+            conn.close()
 
 
 # Example usage
@@ -225,22 +254,26 @@ if __name__ == '__main__':
         print(f"\nTotal records in gold.corporate_actions: {count}")
         
         # Query sample
-        with loader.engine.connect() as conn:
-            result = conn.execute(text("""
+        conn = loader.get_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute("""
                 SELECT ticker, action_type, execution_date, ex_dividend_date, 
                        split_ratio, cash_amount
                 FROM gold.corporate_actions
                 ORDER BY COALESCE(execution_date, ex_dividend_date) DESC
                 LIMIT 5
-            """))
+            """)
             
             print("\nSample records:")
-            for row in result:
-                if row.action_type == 'SPLIT':
-                    print(f"  {row.ticker} SPLIT on {row.execution_date}: {row.split_ratio}:1")
+            for row in cur.fetchall():
+                if row[1] == 'SPLIT':
+                    print(f"  {row[0]} SPLIT on {row[2]}: {row[4]}:1")
                 else:
-                    print(f"  {row.ticker} DIVIDEND on {row.ex_dividend_date}: ${row.cash_amount}")
+                    print(f"  {row[0]} DIVIDEND on {row[3]}: ${row[5]}")
+            
+            cur.close()
+        finally:
+            conn.close()
     else:
         print("No data to load (expected if no corporate actions in test data)")
-    
-    loader.close()

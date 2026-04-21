@@ -24,12 +24,13 @@ Usage:
 """
 
 import pandas as pd
+import psycopg2
+from psycopg2.extras import execute_values
 from pathlib import Path
 from datetime import datetime
-from sqlalchemy import create_engine, text
 
 from config import (
-    get_database_url,
+    DATABASE_CONFIG,
     DATA_DIR,
     get_logger,
 )
@@ -45,12 +46,21 @@ class PipelineAuditLoader:
     """
     
     def __init__(self):
-        """Initialize loader with database connection."""
-        self.engine = create_engine(get_database_url())
+        """Initialize loader."""
         self.silver_base_path = DATA_DIR / 'silver' / 'pipeline_audit'
         self.table_name = 'gold.pipeline_audit'
         
         logger.info("PipelineAuditLoader initialized")
+    
+    def get_connection(self):
+        """Create and return a PostgreSQL connection."""
+        return psycopg2.connect(
+            host=DATABASE_CONFIG['host'],
+            port=DATABASE_CONFIG['port'],
+            dbname=DATABASE_CONFIG['database'],
+            user=DATABASE_CONFIG['user'],
+            password=DATABASE_CONFIG['password'],
+        )
     
     def read_silver_data(self) -> pd.DataFrame:
         """
@@ -89,7 +99,7 @@ class PipelineAuditLoader:
         Returns:
             Gold-ready DataFrame
         """
-        # Select columns for Gold table
+        # Select columns for Gold table (match gold_tables.sql schema)
         gold_columns = [
             'audit_id',
             'connector',
@@ -122,30 +132,38 @@ class PipelineAuditLoader:
         
         return df_gold
     
-    def load_to_postgres(self, df: pd.DataFrame, if_exists: str = 'append'):
+    def load_to_postgres(self, conn, df: pd.DataFrame):
         """
-        Load DataFrame to PostgreSQL.
+        Load DataFrame to PostgreSQL using bulk insert.
         
         Args:
+            conn: Database connection
             df: DataFrame to load
-            if_exists: How to behave if table exists ('append', 'replace', 'fail')
         """
         if df.empty:
             logger.warning("No data to load")
             return
         
-        # Load to PostgreSQL
-        df.to_sql(
-            name='pipeline_audit',
-            schema='gold',
-            con=self.engine,
-            if_exists=if_exists,
-            index=False,
-            method='multi',
-            chunksize=1000
-        )
+        columns = list(df.columns)
+        rows = [tuple(row) for row in df.itertuples(index=False, name=None)]
         
-        logger.info(f"Loaded {len(df)} records to {self.table_name}")
+        sql = f"""
+            INSERT INTO gold.pipeline_audit ({', '.join(columns)})
+            VALUES %s
+            ON CONFLICT (audit_id) DO NOTHING
+        """
+        
+        cur = conn.cursor()
+        try:
+            execute_values(cur, sql, rows, page_size=1000)
+            conn.commit()
+            logger.info(f"Loaded {len(df)} records to {self.table_name}")
+        except Exception as exc:
+            conn.rollback()
+            logger.error(f"Failed to load data: {exc}")
+            raise
+        finally:
+            cur.close()
     
     def load_all(self, mode: str = 'replace'):
         """
@@ -173,24 +191,36 @@ class PipelineAuditLoader:
             logger.warning("No valid data after preparation")
             return False
         
-        # Load to PostgreSQL
-        self.load_to_postgres(df_gold, if_exists=mode)
+        # Connect and load
+        conn = self.get_connection()
         
-        logger.info(f"Successfully loaded {len(df_gold)} audit records")
-        
-        return True
+        try:
+            if mode == 'replace':
+                cur = conn.cursor()
+                cur.execute("TRUNCATE TABLE gold.pipeline_audit")
+                conn.commit()
+                cur.close()
+                logger.info("Truncated gold.pipeline_audit table")
+            
+            self.load_to_postgres(conn, df_gold)
+            
+            logger.info(f"Successfully loaded {len(df_gold)} audit records")
+            return True
+            
+        finally:
+            conn.close()
     
     def get_record_count(self) -> int:
         """Get total record count in Gold table."""
-        with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT COUNT(*) FROM gold.pipeline_audit"))
-            count = result.scalar()
-        
-        return count
-    
-    def close(self):
-        """Close database connection."""
-        self.engine.dispose()
+        conn = self.get_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT COUNT(*) FROM gold.pipeline_audit")
+            count = cur.fetchone()[0]
+            cur.close()
+            return count
+        finally:
+            conn.close()
 
 
 # Example usage
@@ -208,19 +238,23 @@ if __name__ == '__main__':
         print(f"\nTotal records in gold.pipeline_audit: {count}")
         
         # Query sample
-        with loader.engine.connect() as conn:
-            result = conn.execute(text("""
+        conn = loader.get_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute("""
                 SELECT connector, execution_mode, status, 
                        records_written, duration_minutes
                 FROM gold.pipeline_audit
                 ORDER BY start_datetime DESC
                 LIMIT 5
-            """))
+            """)
             
             print("\nSample records:")
-            for row in result:
-                print(f"  {row.connector} ({row.execution_mode}): {row.status} - {row.records_written} records in {row.duration_minutes:.2f}min")
+            for row in cur.fetchall():
+                print(f"  {row[0]} ({row[1]}): {row[2]} - {row[3]} records in {row[4]:.2f}min")
+            
+            cur.close()
+        finally:
+            conn.close()
     else:
         print("No data to load (expected if no audit records in test data)")
-    
-    loader.close()

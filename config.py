@@ -24,8 +24,10 @@ Usage:
 
 import os
 import logging
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from dotenv import load_dotenv
+import pandas as pd
 
 # Load environment variables first
 load_dotenv()
@@ -240,6 +242,26 @@ def get_database_url() -> str:
     )
 
 
+def get_ticker_universe():
+    """
+    Read ticker list from external CSV file.
+    
+    Returns:
+        list: List of ticker symbols
+        
+    Fallback:
+        Returns ['AAPL', 'MSFT', 'GOOGL'] if file doesn't exist
+    """
+    ticker_file = DATA_DIR / 'ticker_universe.csv'
+    
+    if ticker_file.exists():
+        df = pd.read_csv(ticker_file)
+        return df['ticker'].tolist()
+    
+    # Fallback if file missing
+    return ['AAPL', 'MSFT', 'GOOGL']
+
+
 # PostgreSQL Schemas
 POSTGRES_SCHEMAS = {
     'bronze': 'bronze',
@@ -272,6 +294,9 @@ DATA_SCOPE = {
     'end_date': os.getenv('DATA_END_DATE', '2026-03-31'),
     'ticker_universe_file': PROJECT_ROOT / 'data' / 'ticker_universe.csv',
 }
+
+# Ticker Universe - Read from external CSV file
+TICKER_UNIVERSE = get_ticker_universe()
 
 # Expected data volumes (for monitoring)
 EXPECTED_VOLUMES = {
@@ -401,9 +426,14 @@ def get_logger(name: str) -> logging.Logger:
     ch.setFormatter(fmt)
 
     # ================================================================
-    # MASTER APP LOG - Everything goes here
+    # MASTER APP LOG - Everything goes here (with rotation)
     # ================================================================
-    app_handler = logging.FileHandler(LOGGING_CONFIG['app_log'], encoding='utf-8')
+    app_handler = RotatingFileHandler(
+        LOGGING_CONFIG['app_log'],
+        maxBytes=10*1024*1024,  # 10 MB max size
+        backupCount=5,  # Keep 5 backup files (app.log.1, app.log.2, etc.)
+        encoding='utf-8'
+    )
     app_handler.setLevel(level)
     app_handler.setFormatter(fmt)
 
@@ -437,12 +467,12 @@ def get_logger(name: str) -> logging.Logger:
     elif 'gold.loaders' in name or ('loader' in name and 'gold' in name):
         layer_log_file = LOGGING_CONFIG['gold_loaders_log']
     
-    # Airflow
-    elif 'airflow' in name or 'dags' in name:
+    # Airflow - Match both DAG files and Airflow runtime context
+    elif 'airflow' in name or 'dags' in name or '_dag' in name or 'unusual_prefix' in name:
         layer_log_file = LOGGING_CONFIG['airflow_log']
     
-    # Kafka
-    elif 'kafka' in name or 'confluent' in name:
+    # Kafka - Match producers, consumers, and Kafka modules
+    elif 'kafka' in name or 'confluent' in name or 'producer' in name or 'consumer' in name:
         layer_log_file = LOGGING_CONFIG['kafka_log']
     
     # Orchestration

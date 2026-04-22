@@ -188,7 +188,7 @@ def run_gold_loader(**context):
 
 def record_pipeline_audit(**context):
     """Record pipeline execution to audit table."""
-    from datetime import datetime
+    from datetime import datetime, timezone
     import uuid
     import psycopg2
     from config import DATABASE_CONFIG
@@ -200,7 +200,7 @@ def record_pipeline_audit(**context):
     
     # Calculate metrics
     start_time = context['dag_run'].start_date
-    end_time = datetime.now()
+    end_time = datetime.now(timezone.utc)
     duration = (end_time - start_time).total_seconds()
     
     # Insert audit record
@@ -240,7 +240,7 @@ def record_pipeline_audit(**context):
         """, (
             str(uuid.uuid4()),
             'edgartools_sec_filings',
-            'airflow_quarterly',
+            'BATCH',
             'SUCCESS',
             start_time,
             end_time,

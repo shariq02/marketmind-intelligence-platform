@@ -175,7 +175,7 @@ def run_gold_loader(**context):
     env['PYTHONPATH'] = str(project_root)
     
     try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True, env=envs)
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True, env=env)
         logger.info(f"Gold Loader output: {result.stdout}")
         return True
     except subprocess.CalledProcessError as e:
@@ -185,7 +185,7 @@ def run_gold_loader(**context):
 
 def record_pipeline_audit(**context):
     """Record pipeline execution to audit table."""
-    from datetime import datetime
+    from datetime import datetime, timezone
     import uuid
     import psycopg2
     from config import DATABASE_CONFIG
@@ -197,7 +197,7 @@ def record_pipeline_audit(**context):
     
     # Calculate metrics
     start_time = context['dag_run'].start_date
-    end_time = datetime.now()
+    end_time = datetime.now(timezone.utc)
     duration = (end_time - start_time).total_seconds()
     
     # Insert audit record
@@ -236,7 +236,7 @@ def record_pipeline_audit(**context):
         """, (
             str(uuid.uuid4()),
             'akshare_macro_indicators',
-            'airflow_monthly',
+            'BATCH',
             'SUCCESS',
             start_time,
             end_time,

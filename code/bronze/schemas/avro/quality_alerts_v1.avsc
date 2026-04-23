@@ -1,0 +1,159 @@
+{
+  "type": "record",
+  "name": "QualityAlert",
+  "namespace": "com.marketmind.quality.alerts.v1",
+  "doc": "Quality check failure alerts. Generated when data quality checks fail in Bronze or Silver layers. System-generated, not from external API.",
+  "fields": [
+    {
+      "name": "alert_id",
+      "type": "string",
+      "doc": "Unique identifier for this alert (UUID format)"
+    },
+    {
+      "name": "check_timestamp",
+      "type": "long",
+      "doc": "Unix timestamp in milliseconds when quality check was performed"
+    },
+    {
+      "name": "layer",
+      "type": {
+        "type": "enum",
+        "name": "Layer",
+        "symbols": ["BRONZE", "SILVER", "GOLD"]
+      },
+      "doc": "Data layer where quality check was performed"
+    },
+    {
+      "name": "table_name",
+      "type": "string",
+      "doc": "Name of the table or dataset that failed quality check (e.g., 'market_bars', 'macro_indicators')"
+    },
+    {
+      "name": "check_type",
+      "type": {
+        "type": "enum",
+        "name": "CheckType",
+        "symbols": [
+          "COMPLETENESS",
+          "FRESHNESS",
+          "UNIQUENESS",
+          "VALIDITY",
+          "CONSISTENCY",
+          "SCHEMA_COMPLIANCE",
+          "RANGE_CHECK"
+        ]
+      },
+      "doc": "Type of quality check that failed"
+    },
+    {
+      "name": "severity",
+      "type": {
+        "type": "enum",
+        "name": "Severity",
+        "symbols": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+      },
+      "doc": "Severity level of the quality issue"
+    },
+    {
+      "name": "check_result",
+      "type": {
+        "type": "enum",
+        "name": "CheckResult",
+        "symbols": ["FAIL", "WARN"]
+      },
+      "doc": "Result of the check: FAIL (blocks pipeline) or WARN (logs but continues)"
+    },
+    {
+      "name": "failure_description",
+      "type": "string",
+      "doc": "Human-readable description of what failed (e.g., 'Missing data for 15 tickers on 2026-01-15')"
+    },
+    {
+      "name": "failure_details",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Detailed technical information about the failure (e.g., JSON with affected tickers, row counts, missing dates)"
+    },
+    {
+      "name": "row_count_checked",
+      "type": "long",
+      "doc": "Total number of rows checked during quality validation"
+    },
+    {
+      "name": "failure_count",
+      "type": "long",
+      "doc": "Number of rows or records that failed the quality check"
+    },
+    {
+      "name": "failure_rate",
+      "type": "double",
+      "doc": "Failure rate as a percentage (failure_count / row_count_checked * 100)"
+    },
+    {
+      "name": "threshold_value",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Threshold value that was violated (e.g., 95.0 for 95% completeness requirement)"
+    },
+    {
+      "name": "actual_value",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Actual measured value that triggered the alert (e.g., 89.5 for actual completeness)"
+    },
+    {
+      "name": "partition_path",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Partition path of the data that failed (e.g., 'year=2026/month=01/day=15'). Null if not partitioned."
+    },
+    {
+      "name": "date_range_start",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Start date of data checked (format: YYYY-MM-DD). Null if not applicable."
+    },
+    {
+      "name": "date_range_end",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "End date of data checked (format: YYYY-MM-DD). Null if not applicable."
+    },
+    {
+      "name": "pipeline_blocked",
+      "type": "boolean",
+      "default": false,
+      "doc": "Whether this quality failure blocked downstream pipeline execution"
+    },
+    {
+      "name": "resolved",
+      "type": "boolean",
+      "default": false,
+      "doc": "Whether this quality issue has been resolved (e.g., via backfill or manual fix)"
+    },
+    {
+      "name": "resolution_timestamp",
+      "type": ["null", "long"],
+      "default": null,
+      "doc": "Unix timestamp in milliseconds when issue was resolved. Null if not resolved."
+    },
+    {
+      "name": "airflow_dag_id",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Airflow DAG ID that performed the quality check. Null if run manually."
+    },
+    {
+      "name": "airflow_task_id",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Airflow Task ID that performed the quality check. Null if run manually."
+    },
+    {
+      "name": "airflow_run_id",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Airflow Run ID (execution date). Null if run manually."
+    }
+  ]
+}

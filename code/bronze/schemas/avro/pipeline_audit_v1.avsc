@@ -1,0 +1,139 @@
+{
+  "type": "record",
+  "name": "PipelineAudit",
+  "namespace": "com.marketmind.pipeline.audit.v1",
+  "doc": "Audit trail for data ingestion pipeline. Tracks what data was ingested, when, and by which connector. System-generated, not from external API.",
+  "fields": [
+    {
+      "name": "audit_id",
+      "type": "string",
+      "doc": "Unique identifier for this audit record (UUID format)"
+    },
+    {
+      "name": "connector_name",
+      "type": {
+        "type": "enum",
+        "name": "ConnectorName",
+        "symbols": ["POLYGON_BARS", "POLYGON_CORPORATE_ACTIONS", "AKSHARE_MACRO", "EDGARTOOLS_FILINGS"]
+      },
+      "doc": "Name of the connector that performed the ingestion"
+    },
+    {
+      "name": "entity_type",
+      "type": "string",
+      "doc": "Type of entity ingested (e.g., 'ticker', 'indicator', 'filing')"
+    },
+    {
+      "name": "entity_id",
+      "type": "string",
+      "doc": "Identifier of the entity (e.g., ticker symbol 'AAPL', indicator name 'US_GDP_QOQ', CIK '0000320193')"
+    },
+    {
+      "name": "start_timestamp",
+      "type": "long",
+      "doc": "Unix timestamp in milliseconds when ingestion started"
+    },
+    {
+      "name": "end_timestamp",
+      "type": "long",
+      "doc": "Unix timestamp in milliseconds when ingestion completed"
+    },
+    {
+      "name": "duration_ms",
+      "type": "long",
+      "doc": "Duration of ingestion in milliseconds"
+    },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "IngestionStatus",
+        "symbols": ["SUCCESS", "PARTIAL_SUCCESS", "FAILURE", "SKIPPED"]
+      },
+      "doc": "Outcome of the ingestion attempt"
+    },
+    {
+      "name": "records_retrieved",
+      "type": "int",
+      "doc": "Number of records retrieved from the source API"
+    },
+    {
+      "name": "records_written",
+      "type": "int",
+      "doc": "Number of records successfully written to Kafka topic"
+    },
+    {
+      "name": "bytes_written",
+      "type": "long",
+      "doc": "Total bytes written to Kafka topic"
+    },
+    {
+      "name": "date_range_start",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Start date of data requested (format: YYYY-MM-DD). Null if not applicable."
+    },
+    {
+      "name": "date_range_end",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "End date of data requested (format: YYYY-MM-DD). Null if not applicable."
+    },
+    {
+      "name": "error_message",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Error message if status is FAILURE or PARTIAL_SUCCESS. Null if SUCCESS."
+    },
+    {
+      "name": "error_code",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Error code if status is FAILURE or PARTIAL_SUCCESS. Null if SUCCESS."
+    },
+    {
+      "name": "api_calls_made",
+      "type": "int",
+      "doc": "Number of API calls made to source during this ingestion"
+    },
+    {
+      "name": "rate_limited",
+      "type": "boolean",
+      "default": false,
+      "doc": "Whether rate limiting was encountered during ingestion"
+    },
+    {
+      "name": "checkpoint_updated",
+      "type": "boolean",
+      "default": false,
+      "doc": "Whether checkpoint was updated in PostgreSQL after successful ingestion"
+    },
+    {
+      "name": "execution_mode",
+      "type": {
+        "type": "enum",
+        "name": "ExecutionMode",
+        "symbols": ["COLD_BOOTSTRAP", "INCREMENTAL", "BACKFILL", "REPLAY"]
+      },
+      "doc": "Mode of execution: COLD_BOOTSTRAP (initial historical load), INCREMENTAL (daily updates), BACKFILL (fill gaps), REPLAY (rebuild from Bronze)"
+    },
+    {
+      "name": "airflow_dag_id",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Airflow DAG ID that triggered this ingestion. Null if run manually."
+    },
+    {
+      "name": "airflow_task_id",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Airflow Task ID that performed this ingestion. Null if run manually."
+    },
+    {
+      "name": "airflow_run_id",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Airflow Run ID (execution date). Null if run manually."
+    }
+  ]
+}

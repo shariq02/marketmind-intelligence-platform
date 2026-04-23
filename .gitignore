@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+__init__.py
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data files
+data/bronze/
+data/silver/
+data/gold/
+*.csv
+*.parquet
+
+# Logs
+logs/
+*.log
+
+# Airflow
+airflow/logs/
+airflow/*.db
+airflow/*.pid
+
+# Database
+*.db
+*.sqlite
+
+# Credentials
+.env
+config/credentials.json

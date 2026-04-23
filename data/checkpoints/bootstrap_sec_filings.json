@@ -1,0 +1,16 @@
+{
+  "started_at": "2026-04-23T14:33:19.541170",
+  "completed_tickers": [
+    "AAPL",
+    "MSFT",
+    "GOOGL"
+  ],
+  "failed_tickers": [],
+  "total_filings": 105,
+  "filings_by_type": {
+    "10-K": 9,
+    "10-Q": 36,
+    "8-K": 60
+  },
+  "last_updated": "2026-04-23T14:33:59.399377"
+}

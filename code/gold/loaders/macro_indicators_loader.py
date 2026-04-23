@@ -99,6 +99,8 @@ class MacroIndicatorsLoader:
         Returns:
             Gold-ready DataFrame
         """
+        import numpy as np
+        
         # Select columns for Gold table (match gold_tables.sql schema)
         gold_columns = [
             'indicator_name',
@@ -120,6 +122,12 @@ class MacroIndicatorsLoader:
         # Select only existing columns
         existing_columns = [col for col in gold_columns if col in df.columns]
         df_gold = df[existing_columns].copy()
+        
+        # Replace infinity and NaN values with None (NULL in PostgreSQL)
+        numeric_columns = df_gold.select_dtypes(include=[np.number]).columns
+        for col in numeric_columns:
+            df_gold[col] = df_gold[col].replace([np.inf, -np.inf], None)
+            df_gold[col] = df_gold[col].where(df_gold[col].notna(), None)
         
         logger.info(f"Prepared {len(df_gold)} macro indicators for Gold")
         

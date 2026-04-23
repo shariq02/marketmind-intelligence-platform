@@ -123,6 +123,9 @@ class FilingsMetadataLoader:
         # Select only existing columns
         existing_columns = [col for col in gold_columns if col in df.columns]
         df_gold = df[existing_columns].copy()
+
+        # Replace NULL tickers with 'UNKNOWN' to satisfy PostgreSQL constraint
+        df_gold['ticker'] = df_gold['ticker'].fillna('UNKNOWN')
         
         logger.info(f"Prepared {len(df_gold)} filings for Gold")
         

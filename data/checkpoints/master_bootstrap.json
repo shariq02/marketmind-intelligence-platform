@@ -1,0 +1,13 @@
+{
+  "started_at": "2026-04-22T21:54:46.764652",
+  "completed_stages": [
+    "market_bars",
+    "corporate_actions",
+    "macro_indicators",
+    "sec_filings"
+  ],
+  "failed_stages": [],
+  "current_stage": null,
+  "tickers": "AAPL,MSFT,GOOGL,AMZN,NVDA,META,TSLA,BRK.B,UNH,XOM,JNJ,JPM,V,PG,MA,HD,CVX,MRK,ABBV,LLY",
+  "last_updated": "2026-04-22T22:20:47.918001"
+}

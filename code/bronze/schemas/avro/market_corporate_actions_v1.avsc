@@ -1,0 +1,87 @@
+{
+  "type": "record",
+  "name": "CorporateAction",
+  "namespace": "com.marketmind.market.corporate_actions.v1",
+  "doc": "Corporate action events (stock splits, dividends) from Polygon.io Reference API. Includes both split events and dividend distributions.",
+  "fields": [
+    {
+      "name": "ticker",
+      "type": "string",
+      "doc": "Stock ticker symbol (e.g., AAPL, MSFT, GOOGL)"
+    },
+    {
+      "name": "action_type",
+      "type": {
+        "type": "enum",
+        "name": "ActionType",
+        "symbols": ["SPLIT", "DIVIDEND"]
+      },
+      "doc": "Type of corporate action: SPLIT (stock split) or DIVIDEND (dividend payment)"
+    },
+    {
+      "name": "execution_date",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Date when split was executed (format: YYYY-MM-DD). Only for SPLIT actions."
+    },
+    {
+      "name": "split_ratio",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Split ratio (e.g., 4.0 for 4-for-1 split, 0.5 for 1-for-2 reverse split). Only for SPLIT actions."
+    },
+    {
+      "name": "ex_dividend_date",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Ex-dividend date - first date stock trades without dividend (format: YYYY-MM-DD). Only for DIVIDEND actions."
+    },
+    {
+      "name": "record_date",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Record date - shareholders on this date receive dividend (format: YYYY-MM-DD). Only for DIVIDEND actions."
+    },
+    {
+      "name": "declaration_date",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Declaration date - when dividend was announced (format: YYYY-MM-DD). Only for DIVIDEND actions."
+    },
+    {
+      "name": "pay_date",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Payment date - when dividend is actually paid (format: YYYY-MM-DD). Only for DIVIDEND actions."
+    },
+    {
+      "name": "cash_amount",
+      "type": ["null", "double"],
+      "default": null,
+      "doc": "Cash dividend amount per share in USD. Only for DIVIDEND actions."
+    },
+    {
+      "name": "dividend_type",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Type of dividend (e.g., CD for cash dividend, SC for stock dividend). Only for DIVIDEND actions."
+    },
+    {
+      "name": "frequency",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Dividend payment frequency per year (1=annual, 2=semi-annual, 4=quarterly, 12=monthly). Only for DIVIDEND actions."
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "default": "polygon",
+      "doc": "Data source identifier"
+    },
+    {
+      "name": "ingestion_timestamp",
+      "type": "long",
+      "doc": "Unix timestamp in milliseconds when this record was ingested into the system"
+    }
+  ]
+}

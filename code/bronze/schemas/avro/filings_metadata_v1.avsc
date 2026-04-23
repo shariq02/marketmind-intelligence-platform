@@ -1,0 +1,103 @@
+{
+  "type": "record",
+  "name": "FilingMetadata",
+  "namespace": "com.marketmind.filings.metadata.v1",
+  "doc": "SEC filing metadata from EdgarTools library. Includes 10-K, 10-Q, 8-K, and other SEC filing types. Contains metadata only, not full filing content.",
+  "fields": [
+    {
+      "name": "accession_number",
+      "type": "string",
+      "doc": "SEC accession number - unique identifier for the filing (format: 0000320193-25-000079)"
+    },
+    {
+      "name": "ticker",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Stock ticker symbol (e.g., AAPL). May be null for non-public companies."
+    },
+    {
+      "name": "cik",
+      "type": "string",
+      "doc": "Central Index Key - unique company identifier assigned by SEC (e.g., '0000320193' for Apple)"
+    },
+    {
+      "name": "company_name",
+      "type": "string",
+      "doc": "Company name as registered with SEC (e.g., 'Apple Inc.')"
+    },
+    {
+      "name": "form_type",
+      "type": "string",
+      "doc": "Type of SEC form filed (e.g., '10-K', '10-Q', '8-K', 'DEF 14A')"
+    },
+    {
+      "name": "filing_date",
+      "type": "string",
+      "doc": "Date when filing was submitted to SEC (format: YYYY-MM-DD)"
+    },
+    {
+      "name": "report_date",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Period end date covered by the report (format: YYYY-MM-DD). Only applicable for periodic reports like 10-K, 10-Q."
+    },
+    {
+      "name": "acceptance_datetime",
+      "type": ["null", "long"],
+      "default": null,
+      "doc": "Unix timestamp in milliseconds when SEC accepted the filing. May be null if not available."
+    },
+    {
+      "name": "file_number",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "SEC file number assigned to the company (e.g., '001-36743')"
+    },
+    {
+      "name": "is_xbrl",
+      "type": "boolean",
+      "default": false,
+      "doc": "Whether filing includes XBRL (eXtensible Business Reporting Language) data files"
+    },
+    {
+      "name": "is_inline_xbrl",
+      "type": "boolean",
+      "default": false,
+      "doc": "Whether filing uses inline XBRL format (iXBRL)"
+    },
+    {
+      "name": "filing_url",
+      "type": "string",
+      "doc": "URL to the filing index page on SEC EDGAR website"
+    },
+    {
+      "name": "primary_document",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Filename of the primary document (e.g., 'aapl-20250927.htm')"
+    },
+    {
+      "name": "document_count",
+      "type": ["null", "int"],
+      "default": null,
+      "doc": "Total number of documents in the filing"
+    },
+    {
+      "name": "size_bytes",
+      "type": ["null", "long"],
+      "default": null,
+      "doc": "Total size of the filing in bytes"
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "default": "edgartools",
+      "doc": "Data source identifier"
+    },
+    {
+      "name": "ingestion_timestamp",
+      "type": "long",
+      "doc": "Unix timestamp in milliseconds when this record was ingested into the system"
+    }
+  ]
+}

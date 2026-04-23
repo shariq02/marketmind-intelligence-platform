@@ -1,56 +1,36 @@
-# Data (too large for Git)
-data/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+__init__.py
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data files
+data/bronze/
+data/silver/
+data/gold/
+*.csv
 *.parquet
-*.avro
 
 # Logs
 logs/
 *.log
 
-# Secrets
-.env
-config/secrets.yml
-config/secrets.py
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-*.egg
-*.egg-info/
-dist/
-build/
-venv/
-env/
-.pytest_cache/
-.coverage
-htmlcov/
-
 # Airflow
 airflow/logs/
+airflow/*.db
 airflow/*.pid
-airflow/*.err
-airflow/*.out
 
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb
+# Database
+*.db
+*.sqlite
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Temporary
-tmp/
-temp/
-*.tmp
+# Credentials
+.env
+config/credentials.json

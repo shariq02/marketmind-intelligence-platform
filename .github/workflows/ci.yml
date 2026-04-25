@@ -97,7 +97,7 @@ jobs:
         run: |
           pytest tests/integration/test_integration_pipeline.py -v --tb=short -m integration
         env:
-          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          POLYGON_API_KEY: dummy_key_for_ci_tests
           EDGAR_USER_IDENTITY: CI Test ci.test@example.com
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
@@ -300,7 +300,7 @@ jobs:
         run: |
           pytest tests/performance/ -v --tb=short -m performance
         env:
-          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          POLYGON_API_KEY: dummy_key_for_ci_tests
           EDGAR_USER_IDENTITY: CI Test ci.test@example.com
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432

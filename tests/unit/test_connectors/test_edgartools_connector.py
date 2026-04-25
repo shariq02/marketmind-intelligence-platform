@@ -1,9 +1,17 @@
 # MarketMind Intelligence Platform V1
 # Unit Tests for EdgarTools Connector
+# Author: Sharique Mohammad
 # Date: April 24, 2026
 
 import pytest
 from unittest.mock import patch, MagicMock
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT / 'code' / 'bronze' / 'connectors'))
+
 from code.bronze.connectors.edgartools_connector import EdgarToolsConnector
 
 

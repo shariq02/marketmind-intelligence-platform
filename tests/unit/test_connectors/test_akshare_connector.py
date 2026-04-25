@@ -1,10 +1,20 @@
-# MarketMind Intelligence Platform V1
+# ====================================================================
 # Unit Tests for AkShare Connector
-# Date: April 24, 2026
+# MarketMind Intelligence Platform V1
+# Author: Sharique Mohammad
+# Date: April 20, 2026
+# ====================================================================
 
 import pytest
 import pandas as pd
 from unittest.mock import patch
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT / 'code' / 'bronze' / 'connectors'))
+
 from code.bronze.connectors.akshare_connector import AkShareConnector
 
 

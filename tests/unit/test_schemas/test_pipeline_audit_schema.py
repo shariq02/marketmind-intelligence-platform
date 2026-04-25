@@ -5,6 +5,12 @@
 import pytest
 import uuid
 from pydantic import ValidationError
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
 from code.bronze.schemas.pipeline_audit import (
     PipelineAudit, ConnectorName, IngestionStatus, ExecutionMode
 )

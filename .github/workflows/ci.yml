@@ -110,7 +110,7 @@ jobs:
   pytest-integration-kafka:
     name: Integration Tests (Kafka)
     runs-on: ubuntu-latest
-    needs: pytest-integration-api  # Run after API tests, parallel with airflow/database  # CHANGED: Serial execution after API tests
+    needs: pytest-integration-api  # Separate branch from API  # CHANGED: Serial execution after API tests
     
     services:
       zookeeper:
@@ -167,7 +167,7 @@ jobs:
   pytest-integration-airflow:
     name: Integration Tests (Airflow DAGs)
     runs-on: ubuntu-latest
-    needs: pytest-integration-api  # Run after API tests, parallel with kafka/database  # CHANGED: Serial execution after Kafka tests
+    needs: pytest-integration-api  # Separate branch from API  # CHANGED: Serial execution after Kafka tests
     
     steps:
       - name: Checkout code
@@ -208,7 +208,7 @@ jobs:
   pytest-integration-database:
     name: Integration Tests (Database/Parquet)
     runs-on: ubuntu-latest
-    needs: pytest-integration-api  # Run after API tests, parallel with kafka/airflow  # CHANGED: Serial execution after Airflow tests
+    needs: pytest-integration-api  # Separate branch from API  # CHANGED: Serial execution after Airflow tests
     
     steps:
       - name: Checkout code
@@ -243,7 +243,7 @@ jobs:
   pytest-regression:
     name: Regression Tests
     runs-on: ubuntu-latest
-    needs: [pytest-integration-kafka, pytest-integration-airflow, pytest-integration-database]  # After all 3, parallel with performance  # CHANGED: Now runs after database tests (serial)
+    needs: [pytest-integration-kafka, pytest-integration-airflow, pytest-integration-database]  # Wait for all 3, separate branch  # CHANGED: Now runs after database tests (serial)
     
     steps:
       - name: Checkout code
@@ -278,7 +278,7 @@ jobs:
   pytest-performance:
     name: Performance Tests
     runs-on: ubuntu-latest
-    needs: [pytest-integration-kafka, pytest-integration-airflow, pytest-integration-database]  # After all 3, parallel with regression
+    needs: [pytest-integration-kafka, pytest-integration-airflow, pytest-integration-database]  # Wait for all 3, separate branch
     
     steps:
       - name: Checkout code

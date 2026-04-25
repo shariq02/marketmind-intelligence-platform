@@ -24,7 +24,7 @@ jobs:
         run: pip install ruff
       
       - name: Run ruff linter
-        run: ruff check . --exclude airflow/dags/
+        run: ruff check .
 
   pytest-unit:
     name: Unit Tests

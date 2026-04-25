@@ -43,7 +43,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-mock
       
       - name: Run unit tests with coverage
         run: |
@@ -79,7 +80,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -r requirements.txt
+          pip install pytest pytest-mock
       
       - name: Run API integration tests
         timeout-minutes: 15
@@ -123,7 +125,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -r requirements.txt
+          pip install pytest
       
       - name: Wait for Kafka to be ready
         run: |
@@ -155,7 +158,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -r requirements.txt
+          pip install pytest apache-airflow
       
       - name: Initialize Airflow DB
         run: |
@@ -187,7 +191,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -r requirements.txt
+          pip install pytest
       
       - name: Run database/parquet integration tests
         timeout-minutes: 10
@@ -212,7 +217,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -r requirements.txt
+          pip install pytest
       
       - name: Run regression tests
         timeout-minutes: 10
@@ -237,7 +243,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -r requirements.txt
+          pip install pytest
       
       - name: Run performance tests
         timeout-minutes: 20

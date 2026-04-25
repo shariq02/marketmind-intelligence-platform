@@ -6,6 +6,11 @@ import pytest
 import time
 from datetime import datetime, timedelta
 import pandas as pd
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from code.bronze.connectors.polygon_connector import PolygonConnector
 from code.bronze.connectors.akshare_connector import AkShareConnector

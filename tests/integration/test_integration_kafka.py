@@ -8,6 +8,12 @@ import time
 from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka import KafkaException
 
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
 from code.bronze.connectors.polygon_connector import PolygonConnector
 from code.bronze.producers.kafka_producer import KafkaProducer
 from code.bronze.writers.bronze_writer import BronzeWriter

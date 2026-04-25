@@ -4,6 +4,11 @@
 
 import pytest
 import pandas as pd
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from code.gold.loaders.market_bars_loader import MarketBarsLoader
 from code.gold.loaders.corporate_actions_loader import CorporateActionsLoader

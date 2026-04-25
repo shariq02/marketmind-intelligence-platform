@@ -4,10 +4,7 @@
 
 import pytest
 import pandas as pd
-import numpy as np
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch
 from code.silver.transformations.corporate_actions_transformer import CorporateActionsTransformer
 
 
@@ -192,11 +189,11 @@ class TestCorporateActionsTransformer:
         assert 'is_forward_split' in result.columns
         assert 'is_reverse_split' in result.columns
         
-        assert result.iloc[0]['is_forward_split'] == True
-        assert result.iloc[0]['is_reverse_split'] == False
+        assert result.iloc[0]['is_forward_split']
+        assert not result.iloc[0]['is_reverse_split']
         
-        assert result.iloc[1]['is_forward_split'] == False
-        assert result.iloc[1]['is_reverse_split'] == True
+        assert not result.iloc[1]['is_forward_split']
+        assert result.iloc[1]['is_reverse_split']
     
     def test_add_derived_columns_adds_frequency_label(self):
         """Test that dividend frequency labels are added"""
@@ -259,7 +256,7 @@ class TestCorporateActionsTransformer:
     def test_methods_handle_empty_dataframe(self):
         """Test that all methods handle empty DataFrame gracefully"""
         transformer = CorporateActionsTransformer()
-        empty_df = pd.DataFrame()
+        pd.DataFrame()
         
         result = transformer.remove_duplicates(pd.DataFrame({'ticker': [], 'action_type': [], 'execution_date': [], 'ex_dividend_date': []}))
         assert len(result) == 0

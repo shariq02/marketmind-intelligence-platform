@@ -261,7 +261,7 @@ if __name__ == '__main__':
             print(f"\nSilver data shape: {df.shape}")
             print(f"Columns: {list(df.columns)}")
             print(f"\nIndicator categories: {df['indicator_category'].value_counts().to_dict()}")
-            print(f"\nSample record:")
+            print("\nSample record:")
             print(df.iloc[0])
     else:
         print("No data to transform (expected - no macro indicators in test data)")

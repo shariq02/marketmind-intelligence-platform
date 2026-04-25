@@ -3,10 +3,9 @@
 # Date: April 24, 2026
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from code.bronze.connectors.polygon_connector import PolygonConnector, RateLimiter
-from code.bronze.schemas.market_bar import MarketBar
-from code.bronze.schemas.corporate_action import CorporateAction, ActionType
+from code.bronze.schemas.corporate_action import ActionType
 
 
 @pytest.mark.unit

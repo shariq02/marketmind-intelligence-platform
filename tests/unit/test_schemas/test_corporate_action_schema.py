@@ -3,7 +3,6 @@
 # Date: April 24, 2026
 
 import pytest
-from datetime import datetime
 from pydantic import ValidationError
 from code.bronze.schemas.corporate_action import CorporateAction, ActionType
 

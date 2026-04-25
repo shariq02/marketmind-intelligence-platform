@@ -3,9 +3,8 @@
 # Date: April 24, 2026
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from code.bronze.connectors.edgartools_connector import EdgarToolsConnector, RateLimiter
-from code.bronze.schemas.filing_metadata import FilingMetadata
+from unittest.mock import patch, MagicMock
+from code.bronze.connectors.edgartools_connector import EdgarToolsConnector
 
 
 @pytest.mark.unit

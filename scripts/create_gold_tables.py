@@ -43,7 +43,6 @@ def create_gold_tables():
     
     # Connect to database
     try:
-        from sqlalchemy import create_engine
         from sqlalchemy.engine.url import make_url
         
         # Parse connection URL properly

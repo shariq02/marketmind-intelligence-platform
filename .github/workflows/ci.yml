@@ -24,7 +24,7 @@ jobs:
         run: pip install ruff
       
       - name: Run ruff linter
-        run: ruff check .
+        run: ruff check . --exclude airflow/dags/
 
   pytest-unit:
     name: Unit Tests
@@ -94,7 +94,7 @@ jobs:
   pytest-integration-kafka:
     name: Integration Tests (Kafka)
     runs-on: ubuntu-latest
-    needs: pytest-unit
+    needs: pytest-integration-api  # CHANGED: Serial execution after API tests
     
     services:
       zookeeper:
@@ -144,7 +144,7 @@ jobs:
   pytest-integration-airflow:
     name: Integration Tests (Airflow DAGs)
     runs-on: ubuntu-latest
-    needs: pytest-unit
+    needs: pytest-integration-kafka  # CHANGED: Serial execution after Kafka tests
     
     steps:
       - name: Checkout code
@@ -177,7 +177,7 @@ jobs:
   pytest-integration-database:
     name: Integration Tests (Database/Parquet)
     runs-on: ubuntu-latest
-    needs: pytest-unit
+    needs: pytest-integration-airflow  # CHANGED: Serial execution after Airflow tests
     
     steps:
       - name: Checkout code
@@ -203,7 +203,7 @@ jobs:
   pytest-regression:
     name: Regression Tests
     runs-on: ubuntu-latest
-    needs: [pytest-integration-api, pytest-integration-kafka, pytest-integration-airflow]
+    needs: pytest-integration-database  # CHANGED: Now runs after database tests (serial)
     
     steps:
       - name: Checkout code

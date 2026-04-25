@@ -4,10 +4,7 @@
 
 import pytest
 import pandas as pd
-import numpy as np
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch
 from code.silver.transformations.pipeline_audit_transformer import PipelineAuditTransformer
 
 
@@ -178,10 +175,10 @@ class TestPipelineAuditTransformer:
         assert 'is_partial' in result.columns
         assert 'is_skipped' in result.columns
         
-        assert result.iloc[0]['is_success'] == True
-        assert result.iloc[1]['is_failure'] == True
-        assert result.iloc[2]['is_partial'] == True
-        assert result.iloc[3]['is_skipped'] == True
+        assert result.iloc[0]['is_success']
+        assert result.iloc[1]['is_failure']
+        assert result.iloc[2]['is_partial']
+        assert result.iloc[3]['is_skipped']
     
     def test_add_status_flags_adds_performance_flags(self):
         """Test that performance flags are added"""
@@ -198,9 +195,9 @@ class TestPipelineAuditTransformer:
         assert 'is_rate_limited' in result.columns
         assert 'has_errors' in result.columns
         
-        assert result.iloc[0]['is_slow'] == True
-        assert result.iloc[0]['is_rate_limited'] == True
-        assert result.iloc[0]['has_errors'] == True
+        assert result.iloc[0]['is_slow']
+        assert result.iloc[0]['is_rate_limited']
+        assert result.iloc[0]['has_errors']
     
     def test_read_bronze_data_path_not_exists(self, tmp_path):
         """Test read_bronze_data with non-existent path"""

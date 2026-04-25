@@ -26,7 +26,6 @@ Usage:
 import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
-from pathlib import Path
 from datetime import datetime
 
 from config import (
@@ -131,7 +130,7 @@ class MarketBarsLoader:
         ]
         
         # Filter to only valid OHLC records
-        df_valid = df[df['is_valid_ohlc'] == True].copy()
+        df_valid = df[df['is_valid_ohlc']].copy()
         
         if len(df_valid) < len(df):
             invalid_count = len(df) - len(df_valid)

@@ -4,7 +4,6 @@
 
 import pytest
 import pandas as pd
-from pathlib import Path
 
 from code.gold.loaders.market_bars_loader import MarketBarsLoader
 from code.gold.loaders.corporate_actions_loader import CorporateActionsLoader
@@ -127,7 +126,7 @@ class TestDataQualityPersistence:
         df_read = pd.read_parquet(quality_file)
         
         assert len(df_read) == 1
-        assert df_read['passed'].iloc[0] == True
+        assert df_read['passed'].iloc[0]
         assert df_read['table_name'].iloc[0] == 'market_bars'
         
         print("Quality check persistence validated")

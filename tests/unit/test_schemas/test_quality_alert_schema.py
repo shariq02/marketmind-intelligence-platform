@@ -126,7 +126,7 @@ class TestQualityAlertSchema:
         )
         
         assert alert.failure_rate == 10.0
-        assert alert.resolved == False
+        assert not alert.resolved
     
     def test_mark_resolved(self):
         """Test marking alert as resolved"""
@@ -143,7 +143,7 @@ class TestQualityAlertSchema:
         
         alert.mark_resolved()
         
-        assert alert.resolved == True
+        assert alert.resolved
         assert alert.resolution_timestamp is not None
     
     def test_to_dict(self):

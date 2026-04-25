@@ -4,10 +4,7 @@
 
 import pytest
 import pandas as pd
-import numpy as np
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch
 from code.silver.transformations.quality_alerts_transformer import QualityAlertsTransformer
 
 
@@ -148,8 +145,8 @@ class TestQualityAlertsTransformer:
         
         assert 'is_critical' in result.columns
         assert 'is_high' in result.columns
-        assert result.iloc[0]['is_critical'] == True
-        assert result.iloc[1]['is_high'] == True
+        assert result.iloc[0]['is_critical']
+        assert result.iloc[1]['is_high']
     
     def test_add_alert_flags_adds_status_flags(self):
         """Test that status flags are added"""
@@ -167,9 +164,9 @@ class TestQualityAlertsTransformer:
         assert 'is_resolved' in result.columns
         assert 'is_unresolved' in result.columns
         
-        assert result.iloc[0]['is_blocking'] == True
-        assert result.iloc[0]['is_unresolved'] == True
-        assert result.iloc[1]['is_resolved'] == True
+        assert result.iloc[0]['is_blocking']
+        assert result.iloc[0]['is_unresolved']
+        assert result.iloc[1]['is_resolved']
     
     def test_add_alert_flags_adds_check_type_flags(self):
         """Test that check type flags are added"""
@@ -192,10 +189,10 @@ class TestQualityAlertsTransformer:
         assert 'is_uniqueness_issue' in result.columns
         assert 'is_validity_issue' in result.columns
         
-        assert result.iloc[0]['is_completeness_issue'] == True
-        assert result.iloc[1]['is_freshness_issue'] == True
-        assert result.iloc[2]['is_uniqueness_issue'] == True
-        assert result.iloc[3]['is_validity_issue'] == True
+        assert result.iloc[0]['is_completeness_issue']
+        assert result.iloc[1]['is_freshness_issue']
+        assert result.iloc[2]['is_uniqueness_issue']
+        assert result.iloc[3]['is_validity_issue']
     
     def test_add_alert_flags_adds_layer_flags(self):
         """Test that layer flags are added"""
@@ -215,9 +212,9 @@ class TestQualityAlertsTransformer:
         assert 'is_silver_layer' in result.columns
         assert 'is_gold_layer' in result.columns
         
-        assert result.iloc[0]['is_bronze_layer'] == True
-        assert result.iloc[1]['is_silver_layer'] == True
-        assert result.iloc[2]['is_gold_layer'] == True
+        assert result.iloc[0]['is_bronze_layer']
+        assert result.iloc[1]['is_silver_layer']
+        assert result.iloc[2]['is_gold_layer']
     
     def test_read_bronze_data_path_not_exists(self, tmp_path):
         """Test read_bronze_data with non-existent path"""
@@ -285,4 +282,4 @@ class TestQualityAlertsTransformer:
         
         assert len(df) > 0
         assert df.iloc[0]['severity_score'] == 4
-        assert df.iloc[0]['is_critical'] == True
+        assert df.iloc[0]['is_critical']

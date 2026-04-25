@@ -4,8 +4,7 @@
 
 import pytest
 import pandas as pd
-from unittest.mock import Mock, patch, MagicMock
-from pathlib import Path
+from unittest.mock import patch
 
 # Import all loaders
 from code.gold.loaders.market_bars_loader import MarketBarsLoader
@@ -32,7 +31,7 @@ class TestMarketBarsLoader:
     def test_get_connection(self, mock_connect):
         """Test database connection"""
         loader = MarketBarsLoader()
-        conn = loader.get_connection()
+        loader.get_connection()
         assert mock_connect.called
     
     def test_read_silver_partition_path_not_exists(self, tmp_path):

@@ -30,7 +30,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from config import get_logger, DATA_DIR
 
@@ -274,7 +274,7 @@ def run_gold_loaders(data_type='market_bars'):
                 # Get record count if method exists
                 if hasattr(loader, 'get_record_count'):
                     total_count = loader.get_record_count()
-                    logger.info(f"Gold load complete: SUCCESS")
+                    logger.info("Gold load complete: SUCCESS")
                     logger.info(f"Total records in database: {total_count}")
                 else:
                     logger.info("Gold load complete: SUCCESS")

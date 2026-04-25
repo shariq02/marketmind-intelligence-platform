@@ -4,8 +4,7 @@
 
 import pytest
 import pandas as pd
-from unittest.mock import Mock, patch, MagicMock, call
-from pathlib import Path
+from unittest.mock import patch, MagicMock
 from code.gold.loaders.corporate_actions_loader import CorporateActionsLoader
 
 
@@ -219,7 +218,7 @@ class TestCorporateActionsLoader:
             loader = CorporateActionsLoader()
             result = loader.load_all()
             
-            assert result == False
+            assert not result
     
     @patch('code.gold.loaders.corporate_actions_loader.psycopg2.connect')
     def test_load_all_append_mode(self, mock_connect, tmp_path):
@@ -245,7 +244,7 @@ class TestCorporateActionsLoader:
                 loader = CorporateActionsLoader()
                 result = loader.load_all(mode='append')
                 
-                assert result == True
+                assert result
                 # Verify TRUNCATE was NOT called
                 assert not any('TRUNCATE' in str(call) for call in mock_cursor.execute.call_args_list)
     
@@ -273,6 +272,6 @@ class TestCorporateActionsLoader:
                 loader = CorporateActionsLoader()
                 result = loader.load_all(mode='replace')
                 
-                assert result == True
+                assert result
                 # Verify TRUNCATE was called
                 assert any('TRUNCATE' in str(call) for call in mock_cursor.execute.call_args_list)

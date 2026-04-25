@@ -33,10 +33,9 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import time
 import json
 import argparse
-from datetime import datetime, date
+from datetime import datetime
 from typing import List
 
 from config import get_logger, DATA_DIR

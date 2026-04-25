@@ -5,15 +5,12 @@
 import pytest
 import time
 from datetime import datetime, timedelta
-from pathlib import Path
 import pandas as pd
 
 from code.bronze.connectors.polygon_connector import PolygonConnector
 from code.bronze.connectors.akshare_connector import AkShareConnector
 from code.bronze.connectors.edgartools_connector import EdgarToolsConnector
-from code.silver.transformations.market_bars_transformer import MarketBarsTransformer
 from code.silver.quality.quality_checks import QualityChecker
-from code.gold.loaders.market_bars_loader import MarketBarsLoader
 
 
 @pytest.mark.integration

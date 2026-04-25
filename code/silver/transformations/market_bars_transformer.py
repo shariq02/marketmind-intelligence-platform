@@ -266,7 +266,7 @@ if __name__ == '__main__':
         df = pd.read_parquet(silver_file)
         print(f"\nSilver data shape: {df.shape}")
         print(f"Columns: {list(df.columns)}")
-        print(f"\nFirst record:")
+        print("\nFirst record:")
         print(df.iloc[0])
     else:
         print("Transformation failed")

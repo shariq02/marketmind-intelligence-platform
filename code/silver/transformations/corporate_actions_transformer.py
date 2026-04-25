@@ -29,7 +29,6 @@ from pathlib import Path
 from datetime import datetime
 
 from config import (
-    get_bronze_data_path,
     DATA_DIR,
     get_logger,
 )

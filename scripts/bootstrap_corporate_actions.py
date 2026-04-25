@@ -33,7 +33,6 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import time
 import json
 import argparse
 from datetime import datetime
@@ -200,7 +199,7 @@ def bootstrap_corporate_actions(
                     for split in splits:
                         producer.send_corporate_action(split)
                 else:
-                    logger.info(f"  No splits found")
+                    logger.info("  No splits found")
                 
                 # Fetch dividends
                 logger.info(f"  Fetching dividends for {ticker}...")
@@ -212,7 +211,7 @@ def bootstrap_corporate_actions(
                     for dividend in dividends:
                         producer.send_corporate_action(dividend)
                 else:
-                    logger.info(f"  No dividends found")
+                    logger.info("  No dividends found")
                 
                 # Flush producer
                 producer.flush()

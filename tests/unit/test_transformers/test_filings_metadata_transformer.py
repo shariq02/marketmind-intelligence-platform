@@ -4,10 +4,7 @@
 
 import pytest
 import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch
 from code.silver.transformations.filings_metadata_transformer import FilingsMetadataTransformer
 
 
@@ -223,8 +220,8 @@ class TestFilingsMetadataTransformer:
         transformer = FilingsMetadataTransformer()
         result = transformer.categorize_filings(df)
         
-        assert result.iloc[0]['is_amended'] == True
-        assert result.iloc[1]['is_amended'] == False
+        assert result.iloc[0]['is_amended']
+        assert not result.iloc[1]['is_amended']
     
     def test_add_xbrl_flags_adds_structured_data_flag(self):
         """Test that has_structured_data flag is added"""
@@ -238,9 +235,9 @@ class TestFilingsMetadataTransformer:
         result = transformer.add_xbrl_flags(df)
         
         assert 'has_structured_data' in result.columns
-        assert result.iloc[0]['has_structured_data'] == True
-        assert result.iloc[1]['has_structured_data'] == True
-        assert result.iloc[2]['has_structured_data'] == False
+        assert result.iloc[0]['has_structured_data']
+        assert result.iloc[1]['has_structured_data']
+        assert not result.iloc[2]['has_structured_data']
     
     def test_read_bronze_data_path_not_exists(self, tmp_path):
         """Test read_bronze_data with non-existent path"""

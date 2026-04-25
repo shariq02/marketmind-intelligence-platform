@@ -5,8 +5,6 @@
 import pytest
 import os
 import time
-import tempfile
-from pathlib import Path
 from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka import KafkaException
 

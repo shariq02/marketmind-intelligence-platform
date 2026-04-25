@@ -34,7 +34,7 @@ Usage:
 """
 
 import time
-from typing import List, Optional
+from typing import List
 from edgar import Company, set_identity
 
 from config import (

@@ -4,8 +4,7 @@
 
 import pytest
 import pandas as pd
-from unittest.mock import Mock, patch, MagicMock, call
-from pathlib import Path
+from unittest.mock import patch, MagicMock
 from code.gold.loaders.market_bars_loader import MarketBarsLoader
 
 
@@ -237,7 +236,7 @@ class TestMarketBarsLoader:
             loader = MarketBarsLoader()
             result = loader.load_partition('2026-01-02')
             
-            assert result == False
+            assert not result
     
     @patch('code.gold.loaders.market_bars_loader.psycopg2.connect')
     def test_load_partition_upsert_mode(self, mock_connect, tmp_path):
@@ -268,7 +267,7 @@ class TestMarketBarsLoader:
                 loader = MarketBarsLoader()
                 result = loader.load_partition('2026-01-02', mode='upsert')
                 
-                assert result == True
+                assert result
                 # Verify DELETE was called (upsert deletes first)
                 assert any('DELETE' in str(call) for call in mock_cursor.execute.call_args_list)
     
@@ -298,6 +297,6 @@ class TestMarketBarsLoader:
                 loader = MarketBarsLoader()
                 result = loader.load_partition('2026-01-02', mode='replace')
                 
-                assert result == True
+                assert result
                 # Verify TRUNCATE was called
                 assert any('TRUNCATE' in str(call) for call in mock_cursor.execute.call_args_list)

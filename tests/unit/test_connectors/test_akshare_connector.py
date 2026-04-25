@@ -4,9 +4,8 @@
 
 import pytest
 import pandas as pd
-from unittest.mock import Mock, patch, MagicMock
-from code.bronze.connectors.akshare_connector import AkShareConnector, RateLimiter
-from code.bronze.schemas.macro_indicator import MacroIndicator, Frequency
+from unittest.mock import patch
+from code.bronze.connectors.akshare_connector import AkShareConnector
 
 
 @pytest.mark.unit

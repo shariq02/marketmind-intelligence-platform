@@ -4,10 +4,7 @@
 
 import pytest
 import pandas as pd
-import numpy as np
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from code.silver.transformations.macro_indicators_transformer import MacroIndicatorsTransformer
 
 

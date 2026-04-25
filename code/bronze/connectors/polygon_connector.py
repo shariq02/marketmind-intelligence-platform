@@ -40,8 +40,7 @@ Usage:
 """
 
 import time
-from typing import List, Optional
-from datetime import datetime, timedelta
+from typing import List
 from polygon import StocksClient, ReferenceClient
 
 from config import (
@@ -56,7 +55,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent / 'schemas'))
 
 from market_bar import MarketBar
-from corporate_action import CorporateAction, ActionType
+from corporate_action import CorporateAction
 
 logger = get_logger(__name__)
 

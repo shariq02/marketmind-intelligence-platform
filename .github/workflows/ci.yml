@@ -98,6 +98,13 @@ jobs:
           pytest tests/integration/test_integration_pipeline.py -v --tb=short -m integration
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          EDGAR_USER_IDENTITY: CI Test ci.test@example.com
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: test_marketmind
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         continue-on-error: false
 
   pytest-integration-kafka:
@@ -147,6 +154,13 @@ jobs:
         run: |
           pytest tests/integration/test_integration_kafka.py -v --tb=short -m kafka
         env:
+          POLYGON_API_KEY: dummy_key_for_ci_tests
+          EDGAR_USER_IDENTITY: CI Test ci.test@example.com
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: test_marketmind
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
           KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         continue-on-error: false
 
@@ -180,6 +194,14 @@ jobs:
         run: |
           pytest tests/integration/test_integration_airflow.py -v --tb=short -m airflow
         env:
+          POLYGON_API_KEY: dummy_key_for_ci_tests
+          EDGAR_USER_IDENTITY: CI Test ci.test@example.com
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: test_marketmind
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          KAFKA_BOOTSTRAP_SERVERS: localhost:9092
           AIRFLOW_HOME: $(pwd)/airflow
         continue-on-error: false
 
@@ -207,6 +229,15 @@ jobs:
         timeout-minutes: 10
         run: |
           pytest tests/integration/test_integration_database.py -v --tb=short -m "database or parquet or data_flow"
+        env:
+          POLYGON_API_KEY: dummy_key_for_ci_tests
+          EDGAR_USER_IDENTITY: CI Test ci.test@example.com
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: test_marketmind
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         continue-on-error: false
 
   pytest-regression:
@@ -233,6 +264,15 @@ jobs:
         timeout-minutes: 10
         run: |
           pytest tests/regression/ -v --tb=short -m regression
+        env:
+          POLYGON_API_KEY: dummy_key_for_ci_tests
+          EDGAR_USER_IDENTITY: CI Test ci.test@example.com
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: test_marketmind
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         continue-on-error: false
 
   pytest-performance:
@@ -261,6 +301,13 @@ jobs:
           pytest tests/performance/ -v --tb=short -m performance
         env:
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          EDGAR_USER_IDENTITY: CI Test ci.test@example.com
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: test_marketmind
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         continue-on-error: true  # Performance can vary by environment
 
   security-scan:

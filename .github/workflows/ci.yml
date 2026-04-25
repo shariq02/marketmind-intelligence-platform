@@ -43,8 +43,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-cov pytest-mock
+          pip install -e .[dev]
       
       - name: Run unit tests with coverage
         run: |
@@ -54,8 +53,6 @@ jobs:
             --cov-report=html \
             --cov-report=xml \
             --cov-fail-under=78
-        env:
-          PYTHONPATH: .
         continue-on-error: false
       
       - name: Upload coverage reports
@@ -82,15 +79,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-mock
+          pip install -e .[dev]
       
       - name: Run API integration tests
         timeout-minutes: 15
         run: |
           pytest tests/integration/test_integration_pipeline.py -v --tb=short -m integration
         env:
-          PYTHONPATH: .
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         continue-on-error: false
 
@@ -128,8 +123,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
+          pip install -e .[dev]
       
       - name: Wait for Kafka to be ready
         run: |
@@ -141,7 +135,6 @@ jobs:
         run: |
           pytest tests/integration/test_integration_kafka.py -v --tb=short -m kafka
         env:
-          PYTHONPATH: .
           KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         continue-on-error: false
 
@@ -162,8 +155,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest apache-airflow
+          pip install -e .[dev]
       
       - name: Initialize Airflow DB
         run: |
@@ -175,7 +167,6 @@ jobs:
         run: |
           pytest tests/integration/test_integration_airflow.py -v --tb=short -m airflow
         env:
-          PYTHONPATH: .
           AIRFLOW_HOME: $(pwd)/airflow
         continue-on-error: false
 
@@ -196,15 +187,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
+          pip install -e .[dev]
       
       - name: Run database/parquet integration tests
         timeout-minutes: 10
         run: |
           pytest tests/integration/test_integration_database.py -v --tb=short -m "database or parquet or data_flow"
-        env:
-          PYTHONPATH: .
         continue-on-error: false
 
   pytest-regression:
@@ -224,15 +212,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
+          pip install -e .[dev]
       
       - name: Run regression tests
         timeout-minutes: 10
         run: |
           pytest tests/regression/ -v --tb=short -m regression
-        env:
-          PYTHONPATH: .
         continue-on-error: false
 
   pytest-performance:
@@ -252,15 +237,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
+          pip install -e .[dev]
       
       - name: Run performance tests
         timeout-minutes: 20
         run: |
           pytest tests/performance/ -v --tb=short -m performance
         env:
-          PYTHONPATH: .
           POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
         continue-on-error: true  # Performance can vary by environment
 

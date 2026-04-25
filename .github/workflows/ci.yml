@@ -56,6 +56,13 @@ jobs:
             --cov-fail-under=78
         env:
           POLYGON_API_KEY: dummy_key_for_ci_tests
+          EDGAR_USER_IDENTITY: CI Test ci.test@example.com
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: test_marketmind
+          DB_USER: test_user
+          DB_PASSWORD: test_password
+          KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         continue-on-error: false
       
       - name: Upload coverage reports

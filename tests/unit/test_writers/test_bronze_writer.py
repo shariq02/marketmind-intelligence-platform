@@ -5,6 +5,12 @@
 import pytest
 from unittest.mock import patch, MagicMock, mock_open
 
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
 from code.bronze.writers.bronze_writer import BronzeWriter
 
 

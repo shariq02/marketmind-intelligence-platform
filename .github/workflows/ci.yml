@@ -75,7 +75,7 @@ jobs:
   pytest-integration-api:
     name: Integration Tests (API Connectors)
     runs-on: ubuntu-latest
-    needs: pytest-unit
+    needs: pytest-unit  # Run after unit tests, parallel with security-scan
     
     steps:
       - name: Checkout code
@@ -106,11 +106,19 @@ jobs:
           POSTGRES_PASSWORD: test_password
           KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         continue-on-error: true  # Real API key needed for full pass
+  
+  integration-gate:
+    name: Integration Gate
+    runs-on: ubuntu-latest
+    needs: pytest-integration-api
+    steps:
+      - name: Gate passed
+        run: echo "API integration complete, proceeding to parallel integration tests"
 
   pytest-integration-kafka:
     name: Integration Tests (Kafka)
     runs-on: ubuntu-latest
-    needs: pytest-integration-api  # Separate branch from API  # CHANGED: Serial execution after API tests
+    needs: integration-gate  # Separate branch from gate  # CHANGED: Serial execution after API tests
     
     services:
       zookeeper:
@@ -167,7 +175,7 @@ jobs:
   pytest-integration-airflow:
     name: Integration Tests (Airflow DAGs)
     runs-on: ubuntu-latest
-    needs: pytest-integration-api  # Separate branch from API  # CHANGED: Serial execution after Kafka tests
+    needs: integration-gate  # Separate branch from gate  # CHANGED: Serial execution after Kafka tests
     
     steps:
       - name: Checkout code
@@ -208,7 +216,7 @@ jobs:
   pytest-integration-database:
     name: Integration Tests (Database/Parquet)
     runs-on: ubuntu-latest
-    needs: pytest-integration-api  # Separate branch from API  # CHANGED: Serial execution after Airflow tests
+    needs: integration-gate  # Separate branch from gate  # CHANGED: Serial execution after Airflow tests
     
     steps:
       - name: Checkout code
@@ -239,11 +247,19 @@ jobs:
           POSTGRES_PASSWORD: test_password
           KAFKA_BOOTSTRAP_SERVERS: localhost:9092
         continue-on-error: false
+  
+  final-integration-gate:
+    name: Final Integration Gate
+    runs-on: ubuntu-latest
+    needs: [pytest-integration-kafka, pytest-integration-airflow, pytest-integration-database]
+    steps:
+      - name: All integrations complete
+        run: echo "All integration tests complete, proceeding to regression and performance"
 
   pytest-regression:
     name: Regression Tests
     runs-on: ubuntu-latest
-    needs: [pytest-integration-kafka, pytest-integration-airflow, pytest-integration-database]  # Wait for all 3, separate branch  # CHANGED: Now runs after database tests (serial)
+    needs: final-integration-gate  # Wait for gate, separate branch  # CHANGED: Now runs after database tests (serial)
     
     steps:
       - name: Checkout code
@@ -278,7 +294,7 @@ jobs:
   pytest-performance:
     name: Performance Tests
     runs-on: ubuntu-latest
-    needs: [pytest-integration-kafka, pytest-integration-airflow, pytest-integration-database]  # Wait for all 3, separate branch
+    needs: final-integration-gate  # Wait for gate, separate branch
     
     steps:
       - name: Checkout code
@@ -344,9 +360,11 @@ jobs:
       lint,
       pytest-unit,
       pytest-integration-api,
+      integration-gate,
       pytest-integration-kafka,
       pytest-integration-airflow,
       pytest-integration-database,
+      final-integration-gate,
       pytest-regression,
       pytest-performance,
       security-scan

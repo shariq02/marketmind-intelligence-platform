@@ -43,3 +43,17 @@ include = ["code*"]
 [tool.ruff]
 extend-ignore = ["E402"]
 exclude = ["airflow/dags/"]
+
+[tool.pytest.ini_options]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "regression: Regression tests",
+    "performance: Performance tests",
+    "schema: Schema validation tests",
+    "kafka: Kafka integration tests",
+    "airflow: Airflow DAG tests",
+    "database: Database tests",
+    "parquet: Parquet file tests",
+    "data_flow: Data flow tests",
+]

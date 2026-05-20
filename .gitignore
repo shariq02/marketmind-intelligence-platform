@@ -6,7 +6,6 @@ __pycache__/
 .Python
 env/
 venv/
-__init__.py
 
 # Jupyter
 .ipynb_checkpoints/
@@ -34,3 +33,14 @@ airflow/*.pid
 # Credentials
 .env
 config/credentials.json
+
+
+# Test coverage files
+.coverage
+coverage.xml
+htmlcov/
+
+# Pytest configuration
+pytest.ini
+coveragerc
+

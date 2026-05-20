@@ -80,7 +80,7 @@ def test_polygon_connection():
     print(f"API Key found: {api_key[:10]}...")
     
     try:
-        client = StocksClient(api_key=api_key)
+        StocksClient(api_key=api_key)
         print("PASS: StocksClient initialized successfully")
         return True
     except Exception as e:
@@ -111,7 +111,7 @@ def test_daily_bars():
         print("\nResponse Structure:")
         print(f"  Type: {type(response)}")
         print(f"  Keys: {list(response.keys())}")
-        print(f"\nMetadata:")
+        print("\nMetadata:")
         print(f"  Ticker: {response['ticker']}")
         print(f"  Status: {response['status']}")
         print(f"  Results Count: {response['resultsCount']}")
@@ -119,9 +119,9 @@ def test_daily_bars():
         
         if response['results']:
             bar = response['results'][0]
-            print(f"\nSingle Bar Structure:")
+            print("\nSingle Bar Structure:")
             print(f"  Keys: {list(bar.keys())}")
-            print(f"\nBar Values:")
+            print("\nBar Values:")
             print(f"  Open (o): {bar['o']}")
             print(f"  High (h): {bar['h']}")
             print(f"  Low (l): {bar['l']}")
@@ -135,7 +135,7 @@ def test_daily_bars():
             timestamp_readable = datetime.fromtimestamp(bar['t'] / 1000.0)
             print(f"  Timestamp readable: {timestamp_readable}")
             
-            print(f"\nFull JSON Response:")
+            print("\nFull JSON Response:")
             print(json.dumps(response, indent=2))
             
             print("\nPASS: Daily bars retrieved successfully")
@@ -174,7 +174,7 @@ def test_intraday_bars():
         print(f"\nResults Count: {response['resultsCount']}")
         
         if response['results']:
-            print(f"\nFirst 3 bars:")
+            print("\nFirst 3 bars:")
             for i, bar in enumerate(response['results'][:3]):
                 ts = datetime.fromtimestamp(bar['t'] / 1000.0)
                 print(f"  Bar {i+1}: {ts} | o={bar['o']}, h={bar['h']}, l={bar['l']}, c={bar['c']}, v={bar['v']}")
@@ -204,7 +204,7 @@ def test_previous_close():
     try:
         response = client.get_previous_close(symbol='AAPL')
         
-        print(f"\nResponse:")
+        print("\nResponse:")
         print(json.dumps(response, indent=2, default=str))
         
         print("\nPASS: Previous close retrieved successfully")

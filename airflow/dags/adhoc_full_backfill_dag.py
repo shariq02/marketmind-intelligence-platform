@@ -162,7 +162,7 @@ def run_full_backfill(**context):
         duration = (end_time - start_time).total_seconds()
         duration_hours = duration / 3600
         
-        logger.info(f"Backfill completed successfully")
+        logger.info("Backfill completed successfully")
         logger.info(f"Duration: {duration_hours:.2f} hours ({duration:.0f} seconds)")
         
         # Store metrics

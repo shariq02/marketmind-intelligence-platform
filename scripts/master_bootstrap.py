@@ -322,7 +322,7 @@ def run_master_bootstrap(
         logger.info(f"Bootstrap complete for {stage_name}")
         
         # Step 2: Run pipeline
-        logger.info(f"\nStep 2/2: Running pipeline orchestration...")
+        logger.info("\nStep 2/2: Running pipeline orchestration...")
         pipeline_success = run_pipeline()
         
         if not pipeline_success:
@@ -330,7 +330,7 @@ def run_master_bootstrap(
             checkpoint.mark_stage_failed(stage_name)
             
             if not auto:
-                print(f"\nPipeline failed. Continue to next stage? [y/n]: ", end='')
+                print("\nPipeline failed. Continue to next stage? [y/n]: ", end='')
                 choice = input().lower().strip()
                 if choice != 'y':
                     return

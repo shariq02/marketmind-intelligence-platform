@@ -33,7 +33,6 @@ Features:
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator, BranchPythonOperator
-from airflow.operators.bash import BashOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.dates import days_ago
 import sys
@@ -98,7 +97,6 @@ def fetch_market_bars(**context):
     
     Uses bootstrap_market_bars.py with single-day range.
     """
-    from config import DATA_DIR
     import subprocess
     
     execution_date = context['execution_date']
@@ -229,12 +227,12 @@ def run_gold_loader(**context):
 
 def record_pipeline_audit(**context):
     """Record pipeline execution to audit table."""
-    from datetime import datetime, timezone
+    from datetime import timezone
     import uuid
     import psycopg2
     from config import DATABASE_CONFIG
     
-    execution_date = context['execution_date']
+    context['execution_date']
     target_date = context['task_instance'].xcom_pull(
         task_ids='fetch_data',
         key='target_date'

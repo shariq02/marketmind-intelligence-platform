@@ -185,12 +185,12 @@ def run_gold_loader(**context):
 
 def record_pipeline_audit(**context):
     """Record pipeline execution to audit table."""
-    from datetime import datetime, timezone
+    from datetime import timezone
     import uuid
     import psycopg2
     from config import DATABASE_CONFIG
     
-    target_month = context['task_instance'].xcom_pull(
+    context['task_instance'].xcom_pull(
         task_ids='fetch_data',
         key='target_month'
     )

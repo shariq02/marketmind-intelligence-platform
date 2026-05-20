@@ -26,8 +26,6 @@ Usage:
 import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
-from pathlib import Path
-from datetime import datetime
 
 from config import (
     DATABASE_CONFIG,
@@ -121,7 +119,7 @@ class CorporateActionsLoader:
         if 'is_valid_split' in df.columns:
             df_splits = df[
                 (df['action_type'] == 'SPLIT') & 
-                (df['is_valid_split'] == True)
+                (df['is_valid_split'])
             ]
         else:
             df_splits = df[df['action_type'] == 'SPLIT']
@@ -129,7 +127,7 @@ class CorporateActionsLoader:
         if 'is_valid_dividend' in df.columns:
             df_dividends = df[
                 (df['action_type'] == 'DIVIDEND') & 
-                (df['is_valid_dividend'] == True)
+                (df['is_valid_dividend'])
             ]
         else:
             df_dividends = df[df['action_type'] == 'DIVIDEND']

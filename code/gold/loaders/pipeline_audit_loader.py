@@ -26,8 +26,6 @@ Usage:
 import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
-from pathlib import Path
-from datetime import datetime
 
 from config import (
     DATABASE_CONFIG,

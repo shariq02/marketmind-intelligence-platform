@@ -40,7 +40,6 @@ import fastavro
 from io import BytesIO
 from typing import Dict, List, Any
 from datetime import datetime
-from pathlib import Path
 from confluent_kafka import Consumer, KafkaError
 import pandas as pd
 import pyarrow as pa

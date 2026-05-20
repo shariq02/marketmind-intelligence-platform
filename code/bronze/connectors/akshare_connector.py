@@ -39,7 +39,6 @@ import time
 from typing import List
 import akshare as ak
 import pandas as pd
-import math
 
 from config import (
     AKSHARE_RATE_LIMIT,

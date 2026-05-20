@@ -230,7 +230,7 @@ def main():
         conn.close()
         
     except psycopg2.Error as e:
-        print(f"\nERROR: Database error occurred")
+        print("\nERROR: Database error occurred")
         print(f"Error code: {e.pgcode}")
         print(f"Error message: {e.pgerror}")
     except Exception as e:
